@@ -609,19 +609,24 @@ function CaseStudies() {
 function WhyBuyNow() {
   const reasons = [
     {
-      label: "Feature article",
-      title: "Give your story a proper front page.",
-      copy: "Turn your experience, point of view, and social journey into a conversation people can discover and remember.",
+      label: "Early-Mover Credibility",
+      title: "Be remembered from the beginning.",
     },
     {
-      label: "Blog",
-      title: "Keep publishing after the mic is off.",
-      copy: "One recording becomes a steady source of ideas for posts, captions, show notes, and the next story your audience wants to read.",
+      label: "Network Access",
+      title: "Turn one feature into warm introductions.",
     },
     {
-      label: "Functionality opportunity",
-      title: "Make attention useful.",
-      copy: "Connect every episode to your offer, profile, and contact details so interest has a clear next step for your social media audience.",
+      label: "Talent Management",
+      title: "Build a presence that keeps moving.",
+    },
+    {
+      label: "PR and Promotion",
+      title: "Make the episode your PR hook.",
+    },
+    {
+      label: "Industry Contacts and Network",
+      title: "Meet people relevant to your goals.",
     },
   ];
 
@@ -632,9 +637,6 @@ function WhyBuyNow() {
         <ScrollRevealTitle className="why-now__title">
           Why buy now?
         </ScrollRevealTitle>
-        <p className="lede">
-          Your next conversation can do more than fill a feed. It can become an asset your social media  keeps using.
-        </p>
       </div>
 
       <div className="why-now__grid">
@@ -643,7 +645,6 @@ function WhyBuyNow() {
             <span className="why-now__number">0{index + 1}</span>
             <p className="why-now__label">{reason.label}</p>
             <h3>{reason.title}</h3>
-            <p className="why-now__copy">{reason.copy}</p>
           </article>
         ))}
       </div>
