@@ -101,7 +101,7 @@ const DELIVERABLES = [
 
 // Demo time slots for the booking calendar. Swap this for real availability
 // from your calendar provider (Cal.com, Calendly, Google Calendar, etc).
-const SLOT_TIMES = ["10:00 AM", "12:30 PM", "3:00 PM"];
+const SLOT_TIMES = ["10:00 AM", "12:30 PM", "3:00 PM", "5:00 PM"];
 
 const FAQ = [
   {
@@ -644,7 +644,7 @@ function WhyBuyNow() {
           <article className="why-now__card" key={reason.label}>
             <span className="why-now__number">0{index + 1}</span>
             <p className="why-now__label">{reason.label}</p>
-            <h3>{reason.title}</h3>
+            <h3>{reason.title}</h3  >
           </article>
         ))}
       </div>
