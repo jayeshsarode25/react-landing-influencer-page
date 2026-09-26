@@ -1154,6 +1154,61 @@ button {
   background: var(--mist);
 }
 
+/* Lead capture modal */
+.lead-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.lead-modal__dialog {
+  width: 100%;
+  max-width: 440px;
+  padding: clamp(24px, 5vw, 40px);
+  color: #141414;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 32px 100px rgba(0, 0, 0, 0.45);
+}
+
+.lead-modal__eyebrow {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lead-modal__dialog h2 {
+  margin: 0 0 8px;
+  color: #141414;
+  font-size: clamp(24px, 5vw, 36px);
+  line-height: 1.1;
+}
+
+.lead-modal__intro {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.lead-modal__dialog .field {
+  margin-bottom: 14px;
+}
+
+.lead-modal__dialog .btn {
+  margin-top: 6px;
+}
+
 /* ------------------------------------------------------------------ */
 /* Payment modal (rendered by PaymentModal.jsx via a portal)           */
 /* ------------------------------------------------------------------ */

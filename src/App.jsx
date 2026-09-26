@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, animate, motion, useInView } from "framer-motion";
+import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import PaymentModal from "./components/Paymentmodal.jsx";
@@ -180,7 +181,7 @@ function Counter({ to, suffix = "", decimals = 0 }) {
 /* ------------------------------------------------------------------ */
 /* Hero (GSAP: one orchestrated load sequence)                         */
 /* ------------------------------------------------------------------ */
-function Hero() {
+function Hero({ onJoinClick }) {
   const root = useRef(null);
   const box = useRef(null);
   const title = useRef(null);
@@ -239,7 +240,14 @@ function Hero() {
 
       <nav className="hero__nav" aria-label="Primary">
         {NAV.map((item) => (
-          <a key={item.label} href={item.href}>
+          <a
+            key={item.label}
+            href={item.href}
+            onClick={item.label === "Join A Podcast" ? (e) => {
+              e.preventDefault();
+              onJoinClick();
+            } : undefined}
+          >
             {item.label}
           </a>
         ))}
@@ -463,7 +471,7 @@ function About() {
           <p className="panel__copy">
             Tell the story behind the Journey: the first video, the bad moment, the pivot. We record it
             long-form, then cut it into clips your customers will actually watch.
-          </p>
+          </p>  
           <ul className="panel__list">
             <li>Full episode on our channels, linked to your journey</li>
             <li>Vertical clips ready for Instagram, X, and Shorts</li>
@@ -762,6 +770,8 @@ function SlotPicker({ date, slot, onChange }) {
 /* ------------------------------------------------------------------ */
 const GOOGLE_SHEET_WEB_APP_URL =
   "https://script.google.com/macros/s/AKfycbwrSbdME2Td5gUdltEaeoXw8M6ShBMbWz9BCQsKJvcXVRUC4_VHzNW33JX9UfRHaZ5D/exec";
+const POPUP_GOOGLE_SHEET_WEB_APP_URL =
+  "https://script.google.com/macros/s/AKfycbw2yFPLf6NydunFkztbATmjdqTvdDY634W_51WHQzhBUSPaauvgtSr9GYB5fuM7y3X7/exec";
 
 async function sendToSheet(payload) {
   try {
@@ -775,6 +785,75 @@ async function sendToSheet(payload) {
     // Sheet logging is best-effort and must never interrupt a booking.
     console.error("Could not send booking to Google Sheet:", error);
   }
+}
+
+async function sendPopupToSheet(payload) {
+  try {
+    await fetch(POPUP_GOOGLE_SHEET_WEB_APP_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    console.error("Could not send popup lead to Google Sheet:", error);
+  }
+}
+
+function LeadCaptureModal({ onClose }) {
+  const [form, setForm] = useState({ name: "", phone: "", email: "" });
+
+  useEffect(() => {
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, []);
+
+  const update = (key) => (event) => {
+    setForm((current) => ({ ...current, [key]: event.target.value }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    sendPopupToSheet({ ...form, source: "podcast lead popup" });
+    onClose();
+  };
+
+  return createPortal(
+    <div className="lead-modal" role="presentation">
+      <motion.div
+        className="lead-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="lead-modal-title"
+        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <p className="lead-modal__eyebrow">Join the conversation</p>
+        <h2 id="lead-modal-title">Tell us how to reach you.</h2>
+        <p className="lead-modal__intro">Share your details and we’ll be in touch about your podcast session.</p>
+        <form onSubmit={handleSubmit}>
+          <div className="field">
+            <label htmlFor="lead-name">Full name</label>
+            <input id="lead-name" required value={form.name} onChange={update("name")} autoComplete="name" />
+          </div>
+          <div className="field">
+            <label htmlFor="lead-phone">Phone number</label>
+            <input id="lead-phone" type="tel" required value={form.phone} onChange={update("phone")} autoComplete="tel" />
+          </div>
+          <div className="field">
+            <label htmlFor="lead-email">Email</label>
+            <input id="lead-email" type="email" required value={form.email} onChange={update("email")} autoComplete="email" />
+          </div>
+          <button className="btn" type="submit">Send my details</button>
+        </form>
+      </motion.div>
+    </div>,
+    document.body
+  );
 }
 
 function Booking() {
@@ -1065,15 +1144,21 @@ function Footer() {
 /* App                                                                 */
 /* ------------------------------------------------------------------ */
 export default function App() {
+  const [leadOpen, setLeadOpen] = useState(false);
+
   useEffect(() => {
+    const leadTimer = window.setTimeout(() => setLeadOpen(true), 1500);
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener("load", refresh);
-    return () => window.removeEventListener("load", refresh);
+    return () => {
+      window.clearTimeout(leadTimer);
+      window.removeEventListener("load", refresh);
+    };
   }, []);
 
   return (
     <>
-      <Hero />
+      <Hero onJoinClick={() => setLeadOpen(true)} />
       <main>
         <Statement />
         <Feature />
@@ -1084,6 +1169,7 @@ export default function App() {
         <Faq />
       </main>
       <Footer />
+      {leadOpen && <LeadCaptureModal onClose={() => setLeadOpen(false)} />}
     </>
   );
 }
